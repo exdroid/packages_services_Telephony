@@ -120,6 +120,7 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
     private static final int EVENT_TRANSMIT_APDU_BASIC_CHANNEL_DONE = 30;
     private static final int CMD_EXCHANGE_SIM_IO = 31;
     private static final int EVENT_EXCHANGE_SIM_IO_DONE = 32;
+    private static final int CMD_TOGGLE_STATE = 33;
 
     /** The singleton instance. */
     private static PhoneInterfaceManager sInstance;
@@ -1531,6 +1532,23 @@ public class PhoneInterfaceManager extends ITelephony.Stub {
      */
     public boolean hasIccCardUsingSlotId(long slotId) {
         return getPhone(slotId).getIccCard().hasIccCard();
+    }
+
+    /**
+     * Changes Mobile network 2g/3g/lte
+     */
+    public void toggleMobileNetwork(int networkStatus) {
+        mPhone.setPreferredNetworkType(networkStatus,
+                mMainThreadHandler.obtainMessage(CMD_TOGGLE_STATE));
+        android.provider.Settings.Global.putInt(mApp.getContentResolver(),
+                android.provider.Settings.Global.PREFERRED_NETWORK_MODE, networkStatus);
+    }
+
+    /**
+     * Return if the current radio is LTE on GSM.
+     */
+    public int getLteOnGsmMode() {
+        return mPhone.getLteOnGsmMode();
     }
 
     /**
